@@ -23,6 +23,9 @@ if ($user_id) {
         <a class="nav-link" href="articles_submitted.php">Articles Submitted</a>
       </li>
       <li class="nav-item">
+        <a class="nav-link" href="shared_articles.php">Shared Articles</a>
+      </li>
+      <li class="nav-item">
         <a class="nav-link" href="notifications.php">
             Notifications
             <?php if ($unread_count > 0): ?>
