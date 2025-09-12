@@ -43,7 +43,7 @@ $articleObj->markNotificationsAsRead($user_id);
                     <small class="timestamp"><?php echo $note['created_at']; ?></small>
 
                     <?php if (!empty($note['request_id'])): ?>
-                        <form action="core/handleForms.php" method="POST" class="mt-2">
+                        <form action="core/handleForms.php" method="POST" class="mt-2 editRequestForm">
                             <input type="hidden" name="request_id" value="<?php echo $note['request_id']; ?>">
                             <button type="submit" name="edit_request_action" value="accepted" class="btn btn-success btn-sm">Accept</button>
                             <button type="submit" name="edit_request_action" value="rejected" class="btn btn-danger btn-sm">Reject</button>
@@ -59,6 +59,34 @@ $articleObj->markNotificationsAsRead($user_id);
 
 <!-- Bootstrap JS and dependencies -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc3+ogpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+
+<script>
+$(document).ready(function() {
+    // Track which button was clicked
+    $('.editRequestForm button').on('click', function() {
+        $(this).closest('form').find('button').removeAttr('clicked');
+        $(this).attr('clicked', 'true');
+    });
+
+    // Handle AJAX form submission
+    $('.editRequestForm').on('submit', function(e) {
+        e.preventDefault();
+        var form = $(this);
+        var requestId = form.find('input[name="request_id"]').val();
+        var action = form.find('button[type="submit"][clicked=true]').val(); // get clicked button
+
+        $.ajax({
+            type: 'POST',
+            url: form.attr('action'),
+            data: { request_id: requestId, edit_request_action: action },
+            success: function(response) {
+                // replace buttons with Accepted/Rejected text
+                form.html('<span class="font-weight-bold text-' + (action === 'accepted' ? 'success' : 'danger') + '">' + action.charAt(0).toUpperCase() + action.slice(1) + '</span>');
+            }
+        });
+    });
+});
+</script>
 
 </body>
 </html>
