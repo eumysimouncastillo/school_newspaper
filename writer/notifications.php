@@ -41,6 +41,14 @@ $articleObj->markNotificationsAsRead($user_id);
                 <div class="list-group-item notification-card <?php echo $note['is_read'] == 0 ? 'notification-unread' : ''; ?>">
                     <p class="mb-1"><?php echo htmlspecialchars($note['message']); ?></p>
                     <small class="timestamp"><?php echo $note['created_at']; ?></small>
+
+                    <?php if (!empty($note['request_id'])): ?>
+                        <form action="core/handleForms.php" method="POST" class="mt-2">
+                            <input type="hidden" name="request_id" value="<?php echo $note['request_id']; ?>">
+                            <button type="submit" name="edit_request_action" value="accepted" class="btn btn-success btn-sm">Accept</button>
+                            <button type="submit" name="edit_request_action" value="rejected" class="btn btn-danger btn-sm">Reject</button>
+                        </form>
+                    <?php endif; ?>
                 </div>
             <?php endforeach; ?>
         </div>

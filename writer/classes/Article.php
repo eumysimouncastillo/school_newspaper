@@ -132,9 +132,28 @@ class Article extends Database {
     }
 
     public function requestEdit($article_id, $requester_id) {
+        // Insert the edit request
         $sql = "INSERT INTO article_edit_requests (article_id, requester_id) VALUES (?, ?)";
-        return $this->executeNonQuery($sql, [$article_id, $requester_id]);
+        $this->executeNonQuery($sql, [$article_id, $requester_id]);
+        
+        // Get the newly inserted request ID
+        $request_id = $this->pdo->lastInsertId();
+        
+        // Get article owner
+        $article = $this->getArticles($article_id);
+        $owner_id = $article['author_id'];
+        
+        // Get requester username
+        $sql2 = "SELECT username FROM school_publication_users WHERE user_id = ?";
+        $requester = $this->executeQuerySingle($sql2, [$requester_id]);
+        
+        // Add notification to article owner
+        $message = $requester['username'] . " requested to edit your article: " . $article['title'];
+        $this->addNotification($owner_id, $message, $request_id);
+        
+        return $request_id;
     }
+
 
     public function getPendingEditRequests($owner_id) {
         $sql = "SELECT aer.request_id, aer.article_id, aer.requester_id, a.title, u.username 
@@ -153,14 +172,29 @@ class Article extends Database {
 
         // If accepted, grant edit access
         if ($status == 'accepted') {
-            $sql2 = "INSERT INTO article_shared_access (article_id, writer_id, granted_by)
-                    SELECT article_id, requester_id, (SELECT author_id FROM articles WHERE article_id=aer.article_id) 
-                    FROM article_edit_requests aer WHERE request_id=?";
-            $this->executeNonQuery($sql2, [$request_id]);
+            // Get the article_id and requester_id from request
+            $sql1 = "SELECT article_id, requester_id FROM article_edit_requests WHERE request_id=?";
+            $request = $this->executeQuerySingle($sql1, [$request_id]);
+
+            if ($request) {
+                $article_id = $request['article_id'];
+                $writer_id = $request['requester_id'];
+
+                // Get author_id from articles table
+                $sql2 = "SELECT author_id FROM articles WHERE article_id=?";
+                $article = $this->executeQuerySingle($sql2, [$article_id]);
+                $granted_by = $article['author_id'];
+
+                // Insert into shared access
+                $sql3 = "INSERT INTO article_shared_access (article_id, writer_id, granted_by) VALUES (?, ?, ?)";
+                $this->executeNonQuery($sql3, [$article_id, $writer_id, $granted_by]);
+            }
         }
 
         return true;
     }
+
+
 
     public function getSharedArticles($writer_id) {
         $sql = "SELECT a.*, u.username AS author_name
@@ -172,10 +206,16 @@ class Article extends Database {
         return $this->executeQuery($sql, [$writer_id]);
     }
 
-    // Add a notification for a user
-    public function addNotification($user_id, $message) {
-        $sql = "INSERT INTO notifications (user_id, message) VALUES (?, ?)";
-        return $this->executeNonQuery($sql, [$user_id, $message]);
+    // Add a notification for a user, optionally link to a request
+    public function addNotification($user_id, $message, $request_id = null) {
+        $sql = "INSERT INTO notifications (user_id, message, request_id) VALUES (?, ?, ?)";
+        return $this->executeNonQuery($sql, [$user_id, $message, $request_id]);
+    }
+
+    // Inside Article.php
+    public function getEditRequestById($request_id) {
+        $sql = "SELECT * FROM article_edit_requests WHERE request_id = ?";
+        return $this->executeQuerySingle($sql, [$request_id]);
     }
 
 

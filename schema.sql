@@ -34,6 +34,11 @@ CREATE TABLE notifications (
     FOREIGN KEY (user_id) REFERENCES school_publication_users(user_id) ON DELETE CASCADE
 );
 
+ALTER TABLE notifications
+ADD COLUMN request_id INT DEFAULT NULL AFTER message,
+ADD FOREIGN KEY (request_id) REFERENCES article_edit_requests(request_id) ON DELETE CASCADE;
+
+
 CREATE TABLE article_edit_requests (
     request_id INT AUTO_INCREMENT PRIMARY KEY,
     article_id INT NOT NULL,

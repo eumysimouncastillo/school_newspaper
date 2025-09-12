@@ -140,3 +140,37 @@ if (isset($_POST['requestEditBtn'])) {
         exit;
     }
 }
+
+if (isset($_POST['edit_request_action']) && isset($_POST['request_id'])) {
+    $request_id = $_POST['request_id'];
+    $action = $_POST['edit_request_action']; // 'accepted' or 'rejected'
+
+    // Get request details through Article.php method
+    $request = $articleObj->getEditRequestById($request_id);
+
+    if ($request) {
+        $article_id = $request['article_id'];
+        $writer_id = $request['requester_id'];
+
+        // Update request status and grant access if accepted
+        $articleObj->respondToEditRequest($request_id, $action);
+
+        // Prepare notification message
+        $article = $articleObj->getArticles($article_id); // getArticles already in Article.php
+        if ($action === 'accepted') {
+            $message = "Your request to edit the article '" . $article['title'] . "' has been accepted.";
+        } else {
+            $message = "Your request to edit the article '" . $article['title'] . "' has been rejected.";
+        }
+
+        // Notify the writer
+        $articleObj->addNotification($writer_id, $message);
+    }
+
+    // Redirect back to notifications page
+    header("Location: ../notifications.php");
+    exit;
+}
+
+
+
