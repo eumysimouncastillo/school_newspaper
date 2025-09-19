@@ -23,21 +23,21 @@ class Article extends Database {
 
 
 
-        /**
+    /**
      * Retrieves articles from the database.
      * @param int|null $id The article ID to retrieve, or null for all articles.
      * @return array
      */
     public function getArticles($id = null) {
         if ($id) {
-            $sql = "SELECT a.*, u.username, c.name AS category_name
+            $sql = "SELECT a.*, u.username, u.is_admin, c.name AS category_name
                     FROM articles a
                     JOIN school_publication_users u ON a.author_id = u.user_id
                     LEFT JOIN categories c ON a.category_id = c.category_id
                     WHERE a.article_id = ?";
             return $this->executeQuerySingle($sql, [$id]);
         }
-        $sql = "SELECT a.*, u.username, c.name AS category_name
+        $sql = "SELECT a.*, u.username, u.is_admin, c.name AS category_name
                 FROM articles a
                 JOIN school_publication_users u ON a.author_id = u.user_id
                 LEFT JOIN categories c ON a.category_id = c.category_id
@@ -47,14 +47,14 @@ class Article extends Database {
 
     public function getActiveArticles($id = null) {
         if ($id) {
-            $sql = "SELECT a.*, u.username, c.name AS category_name
+            $sql = "SELECT a.*, u.username, u.is_admin, c.name AS category_name
                     FROM articles a
                     JOIN school_publication_users u ON a.author_id = u.user_id
                     LEFT JOIN categories c ON a.category_id = c.category_id
                     WHERE a.article_id = ? AND a.is_active = 1";
             return $this->executeQuerySingle($sql, [$id]);
         }
-        $sql = "SELECT a.*, u.username, c.name AS category_name
+        $sql = "SELECT a.*, u.username, u.is_admin, c.name AS category_name
                 FROM articles a
                 JOIN school_publication_users u ON a.author_id = u.user_id
                 LEFT JOIN categories c ON a.category_id = c.category_id
@@ -64,7 +64,7 @@ class Article extends Database {
     }
 
     public function getArticlesByUserID($user_id) {
-        $sql = "SELECT a.*, u.username, c.name AS category_name
+        $sql = "SELECT a.*, u.username, u.is_admin, c.name AS category_name
                 FROM articles a
                 JOIN school_publication_users u ON a.author_id = u.user_id
                 LEFT JOIN categories c ON a.category_id = c.category_id
@@ -72,6 +72,7 @@ class Article extends Database {
                 ORDER BY a.created_at DESC";
         return $this->executeQuery($sql, [$user_id]);
     }
+
 
 
 

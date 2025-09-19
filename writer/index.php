@@ -395,6 +395,24 @@ if ($userObj->isAdmin()) {
       transform: scale(1.02);
     }
 
+    .badge-category {
+      background: linear-gradient(45deg, var(--primary-green), var(--accent-yellow));
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-bottom: 1rem;
+      margin-left: 0.5rem;
+    }
+
+    .badge-category::before {
+      content: "🗂️";
+    }
+
     /* Request Edit Buttons */
     .btn-request-edit {
       background: linear-gradient(45deg, var(--accent-yellow), var(--accent-orange));
@@ -581,6 +599,11 @@ if ($userObj->isAdmin()) {
                 <h1><?php echo htmlspecialchars($article['title']); ?></h1> 
                 <?php if ($article['is_admin'] == 1) { ?>
                   <div class="badge-admin">Message From Admin</div>
+                <?php } ?>
+                <?php if (!empty($article['category_name'])) { ?>
+                  <div class="badge-category">
+                    <?php echo htmlspecialchars($article['category_name']); ?>
+                  </div>
                 <?php } ?>
                 <div class="article-meta">
                   <strong><?php echo htmlspecialchars($article['username']); ?></strong> • 
