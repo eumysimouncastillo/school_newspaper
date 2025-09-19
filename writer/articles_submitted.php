@@ -64,6 +64,23 @@ if ($userObj->isAdmin()) {
                   <div class="form-group mt-4">
                     <input type="text" class="form-control" name="title" value="<?php echo $article['title']; ?>">
                   </div>
+                  <?php
+                  // Load categories
+                  $categories = $articleObj->getCategories();
+                  ?>
+                  <div class="form-group">
+                    <label for="category_id">🗂️ Update Category</label>
+                    <select name="category_id" id="category_id" class="form-control">
+                      <option value="">-- Uncategorised --</option>
+                      <?php foreach ($categories as $cat): ?>
+                        <?php $selected = ($cat['category_id'] == $article['category_id']) ? 'selected' : ''; ?>
+                        <option value="<?php echo $cat['category_id']; ?>" <?php echo $selected; ?>>
+                          <?php echo htmlspecialchars($cat['name']); ?>
+                        </option>
+                      <?php endforeach; ?>
+                    </select>
+                  </div>
+
                   <div class="form-group">
                     <textarea name="description" id="" class="form-control"><?php echo $article['content']; ?></textarea>
                     <input type="hidden" name="article_id" value="<?php echo $article['article_id']; ?>">
