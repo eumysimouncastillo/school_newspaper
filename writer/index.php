@@ -1,6 +1,7 @@
 <?php require_once 'classloader.php'; ?>
 
 <?php 
+
 if (!$userObj->isLoggedIn()) {
   header("Location: login.php");
 }
@@ -8,6 +9,9 @@ if (!$userObj->isLoggedIn()) {
 if ($userObj->isAdmin()) {
   header("Location: ../admin/index.php");
 }  
+
+
+
 ?>
 <!doctype html>
 <html lang="en">
@@ -162,6 +166,41 @@ if ($userObj->isAdmin()) {
     .form-control::placeholder {
       color: #a0a6b0;
       font-style: italic;
+    }
+
+    /* Category dropdown specific styling */
+    .form-control-category {
+      border-radius: 15px;
+      border: 2px solid #e0e6ed;
+      padding: 1rem 1.25rem;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+      background: white !important;
+      color: var(--text-dark) !important;
+      width: 100%;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      cursor: pointer;
+    }
+
+    .form-control-category:focus {
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+      transform: translateY(-2px);
+      background: white !important;
+      color: var(--text-dark) !important;
+    }
+
+    .form-control-category:hover {
+      border-color: var(--accent-purple);
+    }
+
+    .form-control-category option {
+      background: white !important;
+      color: var(--text-dark) !important;
+      padding: 0.75rem 1rem;
+      font-size: 1.1rem;
     }
 
     textarea.form-control {
@@ -488,20 +527,40 @@ if ($userObj->isAdmin()) {
             <div class="form-group">
               <input type="text" class="form-control" name="title" placeholder="✨ Enter an amazing title for your article...">
             </div>
+
+            <?php
+            // Load categories from database
+            $categories = $articleObj->getCategories();
+            ?>
+            <div class="form-group">
+              <label for="category_id">🗂️ Choose a Category (optional)</label>
+              <select name="category_id" id="category_id" class="form-control-category">
+                <option value="">-- Uncategorised --</option>
+                <?php foreach ($categories as $cat): ?>
+                  <option value="<?php echo $cat['category_id']; ?>">
+                    <?php echo htmlspecialchars($cat['name']); ?>
+                  </option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+
             <div class="form-group">
               <textarea name="description" class="form-control" placeholder="📖 Share your story with the school community..."></textarea>
             </div>
+
             <!-- Image upload field -->
             <div class="form-group">
               <label for="article_image">Add Some Pictures!</label>
               <input type="file" name="article_image[]" id="article_image" class="form-control-file" multiple>
               <small class="form-text text-muted">📷 You can select multiple images to make your article more engaging!</small>
             </div>
+
             <div class="text-center">
               <input type="submit" class="btn btn-submit" name="insertArticleBtn" value="Publish Article">
             </div>
           </form>
         </div>
+
 
         <!-- Articles Header -->
         <div class="articles-header">

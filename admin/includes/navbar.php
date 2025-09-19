@@ -12,6 +12,9 @@
         <a class="nav-link" href="articles_submitted.php">Articles Submitted</a>
       </li>
       <li class="nav-item">
+        <a class="nav-link" href="categories.php">Categories</a>
+      </li>
+      <li class="nav-item">
         <a class="nav-link" href="core/handleForms.php?logoutUserBtn=1">Logout</a>
       </li>
     </ul>

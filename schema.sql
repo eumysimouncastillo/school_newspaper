@@ -58,3 +58,16 @@ CREATE TABLE article_shared_access (
     FOREIGN KEY (article_id) REFERENCES articles(article_id) ON DELETE CASCADE,
     FOREIGN KEY (writer_id) REFERENCES school_publication_users(user_id) ON DELETE CASCADE
 );
+
+-- 1) Create categories table
+CREATE TABLE IF NOT EXISTS categories (
+    category_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE,
+    description VARCHAR(255) DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 2) Add category_id to articles (nullable)
+ALTER TABLE articles
+ADD COLUMN category_id INT NULL AFTER title,
+ADD CONSTRAINT fk_articles_category FOREIGN KEY (category_id) REFERENCES categories(category_id) ON DELETE SET NULL;
